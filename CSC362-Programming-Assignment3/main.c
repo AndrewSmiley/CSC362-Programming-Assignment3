@@ -61,20 +61,29 @@ void encryptMessage(char *message, int *encryption, int encryptionLength, int co
         
         //wrap around case
         //this should probably be changed to pointer dereferenceing but fuck eeet
-//        if(*message > 'z' || *message > 'Z'){
-//            *message=  (char)((int) *message +*encryption) -26;
-//        }else if (*message < 'A' || *message < 'a'){
-//            *message=  (char)((int) *message +*encryption) + 26;
-//        }
-//        else{
-        *message= (char)((int) *message + *encryption);
-        if (*message > 'z' || *message > 'Z') {
-            *message = (char)((int) *message -26);
+        if(islower(*message)){
+                *message= (char)((int) *message + *encryption);
+            if(*message > 'z'){
+                *message = (char)((int) *message - 26);
+//                *message=  (char)((int) *message +*encryption) -26;
+
+            }else if (*message < 'a'){
+            
+                *message = (char)((int) *message + 26);
+
+            }
+        }else if (isupper(*message)){
+            *message= (char)((int) *message + *encryption);
+            if(*message > 'Z'){
+                *message = (char)((int) *message - 26);
+                //                *message=  (char)((int) *message +*encryption) -26;
+                
+            }else if (*message < 'A'){
+                
+                *message = (char)((int) *message + 26);
+                
+            }
         }
-        if (*message < 'a' || *message < 'A') {
-            *message = (char)((int) *message +26);
-        }
-//        }
         message++;
         encryption++;
         index++;
