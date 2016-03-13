@@ -9,7 +9,9 @@
 #include <stdio.h>
 #include <ctype.h>
 static const int MAX_MESSAGE_LENGTH = 5000;
+static const int MAX_ENCRYPTION_LENGTH = 10;
 void encryptMessage(char*, int*, int, int);
+void dencryptMessage(char*, int*, int, int);
 void loaddata(FILE *fp, char *dataArray);
 void print(char*);
 
@@ -17,7 +19,7 @@ int main(int argc, const char * argv[]) {
     //all variables need to be declared at the top
     char messgeArray[MAX_MESSAGE_LENGTH];
     char *message =  &messgeArray[0];
-    int encryptionArray[10] = {5, 2, -1, 2, -3, 2, -4, -2, 6, 4};
+    int encryptionArray[MAX_ENCRYPTION_LENGTH] = {5, 2, -1, 2, -3, 2, -4, -2, 6, 4};
     int *encryption = &encryptionArray[0];
     FILE *fp = fopen("message1.txt", "r");
     //get the data
@@ -25,28 +27,33 @@ int main(int argc, const char * argv[]) {
     fclose(fp);
     encryptMessage(message, encryption, 10, 10);
     message =  &messgeArray[0];
-
+    putchar('\n');
+    printf("Encrypted Message: \n");
     print(message);
-//    printf("%d", (int) 'a');
+    dencryptMessage(message, encryption, 10, 10);
+    message =  &messgeArray[0];
+    printf("Dencrypted Message: \n");
+    print(message);
     return 0;
 }
 
 
 void loaddata(FILE *fp, char *dataArray){
+    //declare variables at the top
     int counter=0;
-    int c;
+    char c;
+    //read each character into the
     while ((c=fgetc(fp)) != EOF) {
         dataArray[counter] = c;
         counter++;
     }
     
-    counter++;
+    //add the termnation character
     dataArray[counter] = '\0';
-//    *(dataArray+counter) = '\0';
 }
 void encryptMessage(char *message, int *encryption, int encryptionLength, int control){
     int index = 0;
-
+    //iterate till we reach the end
     while(*message != '\0'){
         //if it's not a letter, just skip it.
         if(!isalpha(*message)){
@@ -60,13 +67,12 @@ void encryptMessage(char *message, int *encryption, int encryptionLength, int co
         }
         
         //wrap around case
-        //this should probably be changed to pointer dereferenceing but fuck eeet
         if(islower(*message)){
-                *message= (char)((int) *message + *encryption);
+            //make hte change
+            *message= (char)((int) *message + *encryption);
+            //check to see if it falls out of hte range of valid chars...
             if(*message > 'z'){
                 *message = (char)((int) *message - 26);
-//                *message=  (char)((int) *message +*encryption) -26;
-
             }else if (*message < 'a'){
             
                 *message = (char)((int) *message + 26);
@@ -74,6 +80,7 @@ void encryptMessage(char *message, int *encryption, int encryptionLength, int co
             }
         }else if (isupper(*message)){
             *message= (char)((int) *message + *encryption);
+            //check to see if it falls out of hte range of valid chars...
             if(*message > 'Z'){
                 *message = (char)((int) *message - 26);
                 //                *message=  (char)((int) *message +*encryption) -26;
@@ -91,11 +98,58 @@ void encryptMessage(char *message, int *encryption, int encryptionLength, int co
         
     }
 }
+
+void dencryptMessage(char *message, int *encryption, int encryptionLength, int control){
+    int index = 0;
+    
+    while(*message != '\0'){
+        //if it's not a letter, just skip it.
+        if(!isalpha(*message)){
+            message++;
+            continue;
+        }
+        //do our check to see if we need to reset the pointer or not
+        if (index == control){
+            encryption = encryption - control;
+            index = 0;
+        }
+        //check if it's lowercase
+        if(islower(*message)){
+            
+            //since we're decrypting, we can just multiply by -1 to reverse the op
+            *message= (char)((int) *message + (*encryption *-1));
+            if(*message > 'z'){
+                *message = (char)((int) *message - 26);
+            }else if (*message < 'a'){
+                *message = (char)((int) *message + 26);
+            }
+        }else if (isupper(*message)){
+            //since we're decrypting, we can just multiply by -1 to reverse the op
+            *message= (char)((int) *message + (*encryption *-1));
+            if(*message > 'Z'){
+                *message = (char)((int) *message - 26);
+            }else if (*message < 'A'){
+                
+                *message = (char)((int) *message + 26);
+                
+            }
+        }
+        //point to the next address in memory
+        message++;
+        //point to the next address in memory
+        encryption++;
+        index++;
+        
+        
+    }
+}
 void print(char* message){
     while (*message != '\0') {
-        printf("%c", *message);
+        putchar(*message);
         message++;
     }
+    putchar('\n');
+    putchar('\n');
     
     
 }
